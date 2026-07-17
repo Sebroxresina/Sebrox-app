@@ -1,9 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#1a1208" />
@@ -384,11 +381,6 @@
         <div class="rb-title">60 / 40</div>
         <div class="rb-desc">60% comp. A / 40% comp. B</div>
       </button>
-      <button class="resin-btn" data-type="1x1" onclick="selectResin(this)">
-        <div class="rb-title">1 × 1</div>
-        <div class="rb-desc">1 parte A / 1 parte B</div>
-        <div class="rb-badge">GEMELOS</div>
-      </button>
       <button class="resin-btn" data-type="uv" onclick="selectResin(this)">
         <div class="rb-title">UV</div>
         <div class="rb-desc">Monocomponente — sin mezcla</div>
@@ -402,15 +394,15 @@
     <div class="inputs-grid">
       <div class="input-wrap">
         <label for="largo">Largo</label>
-        <input type="number" id="largo" placeholder="ej: 29" inputmode="decimal" />
+        <input type="text" id="largo" placeholder="ej: 29" inputmode="decimal" />
       </div>
       <div class="input-wrap">
         <label for="ancho">Ancho</label>
-        <input type="number" id="ancho" placeholder="ej: 16" inputmode="decimal" />
+        <input type="text" id="ancho" placeholder="ej: 16" inputmode="decimal" />
       </div>
       <div class="input-wrap">
         <label for="espesor">Espesor</label>
-        <input type="number" id="espesor" value="0.2" inputmode="decimal" />
+        <input type="text" id="espesor" placeholder="ej: 0,2" inputmode="decimal" value="0.2" />
       </div>
     </div>
     <div class="input-hint">Espesor recomendado: 0.2 cm para encapsulado</div>
@@ -512,9 +504,9 @@
 
   // ─── CALCULATE ───────────────────────────────────────────
   function calcular() {
-    const l = parseFloat(document.getElementById('largo').value);
-    const a = parseFloat(document.getElementById('ancho').value);
-    const e = parseFloat(document.getElementById('espesor').value);
+    const l = parseFloat(document.getElementById('largo').value.replace(',','.'));
+    const a = parseFloat(document.getElementById('ancho').value.replace(',','.'));
+    const e = parseFloat(document.getElementById('espesor').value.replace(',','.'));
     if (!l || !a || !e || l <= 0 || a <= 0 || e <= 0) {
       alert('Por favor completá todas las medidas correctamente.');
       return;
@@ -545,8 +537,6 @@
       if (currentResin === '2x1') {
         const p = total / 3;
         compA = p * 2; compB = p;
-      } else if (currentResin === '1x1') {
-        compA = total / 2; compB = total / 2;
       } else {
         compA = total * 0.6; compB = total * 0.4;
       }
@@ -574,17 +564,49 @@
   }
 
   function getResinLabel() {
-    return { '2x1': '2 × 1', '1x1': '1 × 1', '6040': '60 / 40', 'uv': 'UV' }[currentResin];
+    return { '2x1': '2 × 1', '6040': '60 / 40', 'uv': 'UV' }[currentResin];
   }
 
   // ─── TIMER ───────────────────────────────────────────────
+  let audioCtx = null;
+  let phaseEnd = null;
+
+  function unlockAudio() {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = audioCtx.createBuffer(1, 1, 22050);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch(e) {}
+  }
+
+  function beep() {
+    // Vibración: patrón de 3 pulsos (funciona aunque esté en modo silencio/vibrador)
+    try {
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]);
+    } catch(e) {}
+    // Sonido: se activa si el volumen está habilitado
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      [0, 0.35, 0.7].forEach(t => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.5, audioCtx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.3);
+        o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + 0.3);
+      });
+    } catch(e) {}
+  }
+
   function formatTime(s) {
     return String(Math.floor(s / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
   }
 
   function updateArc(secs, total, color) {
-    const progress = secs / total;
-    const dash = CIRC * progress;
+    const dash = CIRC * (secs / total);
     document.getElementById('timer-arc').setAttribute('stroke-dasharray', `${dash} ${CIRC}`);
     document.getElementById('timer-arc').setAttribute('stroke', color);
     document.getElementById('timer-text').textContent = formatTime(secs);
@@ -592,33 +614,32 @@
   }
 
   function startTimer() {
+    unlockAudio();
     timerPhase = 'mezcla';
-    timeLeft = MEZCLA;
+    phaseEnd = Date.now() + MEZCLA * 1000;
     showTimerActive();
-    tick();
-    timerInterval = setInterval(tick, 1000);
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 500);
   }
 
   function tick() {
+    const remaining = Math.max(0, Math.round((phaseEnd - Date.now()) / 1000));
     const isMezcla = timerPhase === 'mezcla';
-    const total = isMezcla ? MEZCLA : VENTANA;
-    const color = isMezcla ? '#c9a96e' : '#e8d5b0';
-    updateArc(timeLeft, total, color);
-
-    if (timeLeft <= 0) {
+    updateArc(remaining, isMezcla ? MEZCLA : VENTANA, isMezcla ? '#c9a96e' : '#e8d5b0');
+    if (remaining <= 0) {
       clearInterval(timerInterval);
       if (timerPhase === 'mezcla') {
+        beep();
         timerPhase = 'ventana';
-        timeLeft = VENTANA;
+        phaseEnd = Date.now() + VENTANA * 1000;
         updatePhaseUI();
-        timerInterval = setInterval(tick, 1000);
+        timerInterval = setInterval(tick, 500);
       } else {
+        beep();
         timerPhase = 'done';
         showTimerDone();
       }
-      return;
     }
-    timeLeft--;
   }
 
   function updatePhaseUI() {
@@ -648,7 +669,7 @@
 
   function resetTimer() {
     clearInterval(timerInterval);
-    timerPhase = null; timeLeft = 0;
+    timerPhase = null; phaseEnd = null;
     document.getElementById('timer-idle').classList.remove('hidden');
     document.getElementById('timer-active').classList.add('hidden');
     document.getElementById('timer-done').classList.add('hidden');
