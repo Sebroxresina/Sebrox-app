@@ -375,7 +375,11 @@
       <button class="resin-btn active" data-type="2x1" onclick="selectResin(this)">
         <div class="rb-title">2 × 1</div>
         <div class="rb-desc">2 partes A / 1 parte B</div>
-        <div class="rb-badge">★ RECOMENDADA</div>
+      </button>
+      <button class="resin-btn" data-type="1x1" onclick="selectResin(this)">
+        <div class="rb-title">1 × 1</div>
+        <div class="rb-desc">1 parte A / 1 parte B</div>
+        <div class="rb-badge">Gemelos</div>
       </button>
       <button class="resin-btn" data-type="6040" onclick="selectResin(this)">
         <div class="rb-title">60 / 40</div>
@@ -537,6 +541,8 @@
       if (currentResin === '2x1') {
         const p = total / 3;
         compA = p * 2; compB = p;
+      } else if (currentResin === '1x1') {
+        compA = total / 2; compB = total / 2;
       } else {
         compA = total * 0.6; compB = total * 0.4;
       }
@@ -564,7 +570,7 @@
   }
 
   function getResinLabel() {
-    return { '2x1': '2 × 1', '6040': '60 / 40', 'uv': 'UV' }[currentResin];
+    return { '2x1': '2 × 1', '1x1': '1 × 1', '6040': '60 / 40', 'uv': 'UV' }[currentResin];
   }
 
   // ─── TIMER ───────────────────────────────────────────────
