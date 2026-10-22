@@ -223,7 +223,7 @@
     }
     .step-row .sr-label { font-size: 12px; color: rgba(255,255,255,0.5); }
     .step-row .sr-note { font-size: 10px; color: rgba(201,169,110,0.4); margin-top: 2px; }
-    .step-row .sr-val { font-size: 14px; font-family: var(--serif); font-weight: 700; color: rgba(255,255,255,0.7); }
+    .step-row .sr-val { white-space: nowrap; padding-left: 10px; font-size: 14px; font-family: var(--serif); font-weight: 700; color: rgba(255,255,255,0.7); }
     .step-row.highlight .sr-label { font-size: 14px; color: var(--gold-light); font-weight: 700; }
     .step-row.highlight .sr-val { font-size: 18px; color: var(--gold); }
 
@@ -328,6 +328,119 @@
     section:first-child { margin-top: 32px; }
 
     .hidden { display: none !important; }
+
+    /* TABS */
+    .tabs {
+      display: flex; gap: 8px;
+      max-width: 480px; margin: 20px auto 0; padding: 0 20px;
+    }
+    .tab-btn {
+      flex: 1; padding: 12px 8px; border-radius: 12px;
+      border: 1px solid rgba(201,169,110,0.2);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.5);
+      font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-btn.active {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(139,94,42,0.15));
+      color: var(--gold-light);
+    }
+
+    /* PRESUPUESTOS */
+    .presu-intro {
+      margin-top: 28px; padding: 20px; border-radius: 18px; text-align: center;
+      border: 1px solid rgba(201,169,110,0.25);
+      background: linear-gradient(135deg, rgba(201,169,110,0.1), rgba(139,94,42,0.06));
+    }
+    .presu-intro h2 { font-family: var(--serif); font-size: 19px; color: var(--gold-light); line-height: 1.3; }
+    .presu-intro p { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 8px; line-height: 1.6; }
+
+    .field { margin-top: 10px; }
+    .field label { display: block; font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+    .field input, .field select, .acc-row input {
+      width: 100%; padding: 12px 10px; border-radius: 10px;
+      border: 1px solid rgba(201,169,110,0.2);
+      background: rgba(255,255,255,0.04);
+      color: var(--gold-light); font-size: 16px; font-family: var(--sans);
+      outline: none; -webkit-appearance: none; appearance: none;
+      transition: border-color 0.2s;
+    }
+    .field select { background-color: #2c1e0a; text-align: center; }
+    .field input:focus, .acc-row input:focus { border-color: rgba(201,169,110,0.6); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-kit { display: grid; grid-template-columns: 1fr 76px 1fr; gap: 10px; }
+
+    .use-calc-btn {
+      margin-top: 8px; background: none;
+      border: 1px dashed rgba(201,169,110,0.4); color: var(--gold);
+      padding: 8px 14px; border-radius: 50px; font-size: 12px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .acc-row {
+      margin-top: 10px; padding: 10px; border-radius: 12px;
+      border: 1px solid rgba(201,169,110,0.15); background: rgba(0,0,0,0.15);
+    }
+    .acc-top { display: grid; grid-template-columns: 1fr 30px; gap: 6px; align-items: center; }
+    .acc-nums { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .acc-nums label { display: block; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
+    .acc-row input { padding: 10px 8px; font-size: 15px; }
+    .acc-row input.num { text-align: center; }
+    .acc-calc { font-size: 11px; color: rgba(201,169,110,0.7); margin-top: 8px; text-align: right; min-height: 14px; }
+    .acc-del {
+      background: none; border: none; color: rgba(255,255,255,0.3);
+      font-size: 18px; cursor: pointer; padding: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .add-acc-btn {
+      width: 100%; margin-top: 10px; padding: 12px; border-radius: 12px;
+      border: 1px dashed rgba(201,169,110,0.35); background: transparent;
+      color: var(--gold); font-size: 13px; font-weight: 600; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .price-hero { text-align: center; padding: 6px 0 4px; }
+    .price-hero .ph-label { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+    .price-hero .ph-val { font-family: var(--serif); font-size: 38px; font-weight: 900; color: var(--gold-light); margin-top: 6px; }
+    .price-hero .ph-sub { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+    .perfil {
+      width: 100%; text-align: left; margin-top: 10px; padding: 14px 16px;
+      border-radius: 14px; border: 2px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2); color: #fff; cursor: pointer;
+      font-family: var(--sans); transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .perfil.active { border-color: var(--gold); background: linear-gradient(135deg, rgba(201,169,110,0.16), rgba(139,94,42,0.1)); }
+    .perfil .pf-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .perfil .pf-name { font-size: 14px; font-weight: 700; color: var(--gold-light); }
+    .tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tipo-btn {
+      padding: 12px 8px; border-radius: 12px; text-align: center; cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.5); font-family: var(--sans); transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tipo-btn.active { border-color: var(--gold); background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(139,94,42,0.15)); color: var(--gold-light); }
+    .tipo-btn .tb-title { font-family: var(--serif); font-size: 15px; font-weight: 700; }
+    .tipo-btn .tb-desc { font-size: 10px; margin-top: 3px; opacity: 0.75; }
+
+    .perfil .pf-mult { font-size: 10px; color: var(--gold); letter-spacing: 1px; margin-left: 6px; }
+    .perfil .pf-price { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+    .perfil .pf-desc { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 6px; line-height: 1.5; }
+    .perfil .pf-detail { font-size: 11px; color: rgba(201,169,110,0.7); margin-top: 6px; }
+
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+    .action-btn {
+      padding: 13px 8px; border-radius: 12px; cursor: pointer;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .action-btn.primary { border: none; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #1a1208; }
+    .action-btn.ghost { border: 1px solid rgba(201,169,110,0.35); background: transparent; color: var(--gold); }
   </style>
 </head>
 <body>
@@ -366,7 +479,14 @@
   <p>Diseños &amp; Cursos</p>
 </div>
 
+<!-- PESTAÑAS -->
+<div class="tabs">
+  <button class="tab-btn active" data-view="calc" onclick="showView('calc')">🧪 Calculadora</button>
+  <button class="tab-btn" data-view="presu" onclick="showView('presu')">💰 Presupuestador</button>
+</div>
+
 <main>
+<div id="view-calc">
 
   <!-- TIPO DE RESINA -->
   <section>
@@ -479,6 +599,187 @@
       <button class="new-session-btn" onclick="resetTimer()">Nueva sesión</button>
     </div>
   </section>
+</div><!-- /view-calc -->
+
+<!-- ═══════════════ PRESUPUESTOS ═══════════════ -->
+<div id="view-presu" class="hidden">
+
+  <!-- BLOQUEO CON CÓDIGO -->
+  <div id="presu-lock" class="presu-intro" style="padding:28px 20px">
+    <div style="font-size:34px">🔒</div>
+    <h2 style="margin-top:8px">Presupuestador Inteligente Sebrox</h2>
+    <p>Calculá cuánto cobrar tus piezas con el criterio Sebrox: costos, rango de precio según tu perfil de vendedor y presupuesto listo para enviar a tu cliente.</p>
+
+    <div style="margin-top:18px;padding:16px;border-radius:14px;background:rgba(0,0,0,0.25)">
+      <div style="display:inline-block;font-size:10px;letter-spacing:2px;font-weight:700;color:#1a1208;background:var(--gold);padding:4px 10px;border-radius:50px;text-transform:uppercase">🚀 Precio de lanzamiento</div>
+      <div style="font-family:var(--serif);font-size:32px;font-weight:900;color:var(--gold-light);margin-top:8px">$ 19.200</div>
+      <div style="font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-top:2px">Pago único · para siempre</div>
+      <a id="mp-link" href="#" target="_blank" rel="noopener" class="calc-btn" style="display:block;text-decoration:none;margin-top:12px;font-family:var(--sans);font-size:14px;letter-spacing:0.5px;padding:16px 8px;white-space:nowrap">PAGAR CON MERCADO PAGO</a>
+      <p style="margin-top:12px;font-size:12px">Después de pagar, te llega tu código personal <strong style="color:var(--gold-light)">por mail en unos minutos</strong> (al mail de tu cuenta de Mercado Pago). Revisá también spam y promociones.</p>
+    </div>
+
+    <div style="margin-top:22px;font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase">¿Ya tenés tu código?</div>
+    <div class="field" style="margin-top:10px">
+      <input type="text" id="lock-code" placeholder="SBX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-align:center;letter-spacing:2px" />
+    </div>
+    <div id="lock-error" class="hidden" style="font-size:12px;color:#e8a07a;margin-top:8px">El código no es válido. Revisalo e intentá de nuevo.</div>
+    <button class="calc-btn" style="margin-top:14px" onclick="desbloquear()">DESBLOQUEAR</button>
+    <p style="margin-top:16px">¿Pagaste y no te llegó el código? Escribinos por Instagram:<br><a href="https://instagram.com/sebrox.ar" target="_blank" rel="noopener" style="color:var(--gold)">@sebrox.ar</a></p>
+  </div>
+
+  <div id="presu-content" class="hidden">
+
+  <div class="presu-intro">
+    <h2>Realizá tus presupuestos estimativos con Sebrox</h2>
+    <p>Cargá lo que gastaste en materiales y la app te sugiere el precio de venta con el criterio Sebrox.</p>
+  </div>
+
+  <!-- PRODUCTO -->
+  <section>
+    <div class="section-label">Producto</div>
+    <div class="field">
+      <label for="p-nombre">¿Qué vas a presupuestar?</label>
+      <input type="text" id="p-nombre" placeholder="ej: Llavero con inicial" />
+    </div>
+    <div class="field">
+      <label>¿Qué tipo de pieza es?</label>
+      <div class="tipo-grid">
+        <button type="button" class="tipo-btn active" data-tipo="chica" onclick="elegirTipo('chica')">
+          <div class="tb-title">Pieza chica</div>
+          <div class="tb-desc">Llaveros, señaladores, bijou</div>
+        </button>
+        <button type="button" class="tipo-btn" data-tipo="grande" onclick="elegirTipo('grande')">
+          <div class="tb-title">Pieza grande</div>
+          <div class="tb-desc">Bandejas, mesas, cuadros</div>
+        </button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="p-cant">Cantidad de piezas</label>
+      <input type="text" id="p-cant" inputmode="numeric" value="1" style="text-align:center" />
+    </div>
+    <div class="input-hint">Cargá todo lo que usás para el trabajo completo (todas las piezas)</div>
+  </section>
+
+  <!-- RESINA -->
+  <section>
+    <div class="section-label">Resina</div>
+    <div class="field">
+      <label for="p-gramos">Resina utilizada (gramos)</label>
+      <input type="text" id="p-gramos" inputmode="decimal" placeholder="ej: 120" style="text-align:center" />
+      <button type="button" id="use-calc-btn" class="use-calc-btn hidden" onclick="usarCalculo()"></button>
+    </div>
+    <div class="grid-kit" style="margin-top:10px">
+      <div class="field" style="margin-top:0">
+        <label for="p-kit-size">Tamaño del kit</label>
+        <input type="text" id="p-kit-size" inputmode="decimal" placeholder="ej: 1,5" style="text-align:center" />
+      </div>
+      <div class="field" style="margin-top:0">
+        <label for="p-kit-unit">Unidad</label>
+        <select id="p-kit-unit">
+          <option value="kg">kg</option>
+          <option value="g">g</option>
+        </select>
+      </div>
+      <div class="field" style="margin-top:0">
+        <label for="p-kit-price">Precio del kit ($)</label>
+        <input type="text" id="p-kit-price" inputmode="decimal" placeholder="ej: 35.000" style="text-align:center" />
+      </div>
+    </div>
+    <div class="input-hint">El kit completo: componente A + B</div>
+  </section>
+
+  <!-- ACCESORIOS -->
+  <section>
+    <div class="section-label">Accesorios y otros materiales</div>
+    <div class="tip-box" style="margin-top:10px">
+      💡 <strong>¿Lo compraste por paquete?</strong> Cargá lo que pagaste por el paquete, cuántas unidades trae y cuántas usaste: la app divide sola.<br>
+      <strong>Moldes y herramientas:</strong> en "Trae" poné cuántos usos te rinde (ej: un molde de $900 que, bien cuidado, rinde unos 40 usos).
+    </div>
+    <div id="acc-list"></div>
+    <button type="button" class="add-acc-btn" onclick="addAccesorio()">＋ Agregar material</button>
+    <div class="input-hint">Argollas, moldes, flores, vinilos, cajas, etc.</div>
+  </section>
+
+  <!-- PIGMENTOS Y GLITTER -->
+  <section>
+    <div class="section-label">Pigmentos y glitter</div>
+    <div class="field">
+      <label>¿Qué efecto hiciste?</label>
+      <div class="tipo-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <button type="button" class="tipo-btn efecto-btn active" data-efecto="ninguno" onclick="elegirEfecto('ninguno')">
+          <div class="tb-title">Sin color</div><div class="tb-desc">Cristal</div>
+        </button>
+        <button type="button" class="tipo-btn efecto-btn" data-efecto="letras" onclick="elegirEfecto('letras')">
+          <div class="tb-title">Color</div><div class="tb-desc">Traslúcido y glitter</div>
+        </button>
+        <button type="button" class="tipo-btn efecto-btn" data-efecto="marmol" onclick="elegirEfecto('marmol')">
+          <div class="tb-title">Mármol</div><div class="tb-desc">Efecto mármol</div>
+        </button>
+      </div>
+    </div>
+    <div id="marmol-receta"></div>
+    <div id="pig-fields"></div>
+    <div id="pig-hint" class="input-hint hidden">Cargá lo que pagaste por cada frasco y su tamaño. La app estima cuánto usaste según la resina, con el criterio Sebrox.</div>
+  </section>
+
+  <button class="calc-btn" onclick="calcularPresupuesto()">CALCULAR PRESUPUESTO</button>
+
+  <!-- RESULTADO PRESUPUESTO -->
+  <div id="presu-result" class="result-card hidden">
+    <div class="result-header">
+      <div class="rh-title">Presupuesto estimativo</div>
+      <div class="rh-sub" id="pr-sub"></div>
+    </div>
+    <div class="result-body">
+      <div class="step-row">
+        <div><div class="sr-label">Resina</div><div class="sr-note" id="pr-resina-note"></div></div>
+        <div class="sr-val" id="pr-resina"></div>
+      </div>
+      <div class="step-row">
+        <div><div class="sr-label">Accesorios y materiales</div><div class="sr-note" id="pr-acc-note"></div></div>
+        <div class="sr-val" id="pr-acc"></div>
+      </div>
+      <div id="pr-acc-detalle"></div>
+      <div class="step-row hidden" id="pr-pig-row">
+        <div><div class="sr-label">Pigmentos y glitter</div><div class="sr-note" id="pr-pig-note"></div></div>
+        <div class="sr-val" id="pr-pig"></div>
+      </div>
+      <div class="step-row highlight">
+        <div><div class="sr-label">Costo de materiales</div><div class="sr-note">lo que gastaste</div></div>
+        <div class="sr-val" id="pr-costo"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="price-hero">
+        <div class="ph-label">Rango de precio sugerido Sebrox</div>
+        <div class="ph-val" id="pr-rango" style="font-size:28px"></div>
+        <div class="ph-sub" id="pr-rango-sub"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-label" style="margin-bottom:4px">¿Qué perfil de vendedor querés ser?</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;margin-bottom:4px">Tocá el que va con vos para enviarle ese precio a tu cliente.</div>
+      <div id="perfiles"></div>
+
+      <div id="mayorista" style="margin-top:18px"></div>
+
+      <div class="tip-box">
+        💡 <strong>Criterio Sebrox:</strong> todos los precios parten de tus materiales. Una vez los recuperás, otra vez cubre los gastos del taller (luz, herramientas, packaging, pruebas que salen mal) y lo que está por encima es tu mano de obra y tu ganancia, según el perfil de vendedor que quieras ser.<br>
+        Las <strong>piezas chicas</strong> llevan multiplicadores más altos porque se venden por su valor (personalizadas, para regalo) más que por lo que cuesta el material.
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn primary" onclick="compartirPresupuesto()">📲 Enviar al cliente</button>
+        <button class="action-btn ghost" onclick="nuevoPresupuesto()">Nuevo presupuesto</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /presu-content -->
+</div><!-- /view-presu -->
 
   <!-- FOOTER -->
   <div class="footer">
@@ -518,6 +819,8 @@
     const vol = l * a * e;
     const ml = vol;
     const total = ml * 1.1;
+    lastResinGrams = Math.round(total * 10) / 10;
+    refreshUseCalcBtn();
 
     document.getElementById('result-sub').textContent =
       `${getResinLabel()} · ${l} × ${a} × ${e} cm`;
@@ -680,6 +983,494 @@
     document.getElementById('timer-active').classList.add('hidden');
     document.getElementById('timer-done').classList.add('hidden');
   }
+
+  // ─── PESTAÑAS ────────────────────────────────────────────
+  function showView(view) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    document.getElementById('view-calc').classList.toggle('hidden', view !== 'calc');
+    document.getElementById('view-presu').classList.toggle('hidden', view !== 'presu');
+    window.scrollTo({ top: 0 });
+  }
+
+  // ─── PRESUPUESTOS ────────────────────────────────────────
+  let lastResinGrams = null;
+  let lastPresupuesto = null;
+
+  // Perfiles de vendedor: precio = costo de materiales × mult
+  // × 1 recupera materiales, × 1 cubre gastos del taller; lo que está por encima es mano de obra.
+  // Las piezas chicas llevan multiplicadores más altos: se venden por su valor (personalizado, regalo).
+  const PERFILES = [
+    { nombre: 'Emprendedor/a', desc: 'Estás arrancando y querés salir a vender y hacerte conocer. Precio competitivo.' },
+    { nombre: 'Profesional', desc: 'Ya tenés clientes, buena terminación y vendés con regularidad.' },
+    { nombre: 'Premium', desc: 'Piezas personalizadas o de diseño, terminación impecable y una marca reconocida.' }
+  ];
+  const MULTS = {
+    chica: [3, 5, 7],     // llaveros, señaladores, bijou
+    grande: [3, 3.5, 4]   // bandejas, mesas, cuadros
+  };
+  const TIPO_NOMBRE = { chica: 'pieza chica', grande: 'pieza grande' };
+  const PERFIL_DEFAULT = 1;
+  let tipoPieza = 'chica';
+
+  function elegirTipo(t) {
+    tipoPieza = t;
+    document.querySelectorAll('.tipo-btn[data-tipo]').forEach(b => b.classList.toggle('active', b.dataset.tipo === t));
+  }
+
+  // ─── PIGMENTOS Y GLITTER (estimativo Sebrox) ─────────────
+  // Las cantidades son internas: al alumno solo se le muestra el costo, nunca la receta.
+  // Se escalan según los gramos de resina, así sirven igual para piezas chicas y grandes.
+  const GOTA_ML = 0.04;
+  const PIGMENTOS = {
+    trasl:   { nombre: 'Tinta traslúcida', unidad: 'ml', ej: 'ej: 20' },
+    glitter: { nombre: 'Glitter', unidad: 'g', ej: 'ej: 10' },
+    metal:   { nombre: 'Pigmento metalizado en polvo', unidad: 'g', ej: 'ej: 10' },
+    solido:  { nombre: 'Pigmento sólido / pleno', unidad: 'g', ej: 'ej: 10' }
+  };
+  const EFECTOS = {
+    ninguno: { nombre: 'sin color', base: 1, uso: {} },
+    // Letra (~10 g de mezcla): 1 a 3 gotas de traslúcido + la puntita de un palito de helado de glitter
+    letras:  { nombre: 'color', base: 10, uso: { trasl: 2 * GOTA_ML, glitter: 0.05 } },
+    // Mármol (110 g de mezcla): 10 a 15 gotas de traslúcido; metalizado en vasos 1 y 3 (bajalenguas colmado ~0,3 g c/u);
+    // pigmento sólido en el predominante: palito de helado cargado desde la punta hasta ~1,5-2 cm (~0,4 g)
+    marmol:  { nombre: 'efecto mármol', base: 110, uso: { trasl: 12.5 * GOTA_ML, metal: 0.6, solido: 0.4 } }
+  };
+  const PIG_KEY = 'sebrox-pig-v1';
+  let efecto = 'ninguno';
+
+  function leerPigGuardados() {
+    try { return JSON.parse(localStorage.getItem(PIG_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function guardarPig() {
+    const d = leerPigGuardados();
+    d.efecto = efecto;
+    document.querySelectorAll('#pig-fields .acc-row').forEach(r => {
+      d[r.dataset.pig] = { precio: r.querySelector('.pig-precio').value, frasco: r.querySelector('.pig-frasco').value };
+    });
+    try { localStorage.setItem(PIG_KEY, JSON.stringify(d)); } catch (e) {}
+  }
+
+  function elegirEfecto(e) {
+    if (document.getElementById('pig-fields').children.length) guardarPig();
+    efecto = e;
+    document.querySelectorAll('.efecto-btn').forEach(b => b.classList.toggle('active', b.dataset.efecto === e));
+    const guardados = leerPigGuardados();
+    const claves = Object.keys(EFECTOS[e].uso);
+    document.getElementById('pig-fields').innerHTML = claves.map(k => {
+      const pg = PIGMENTOS[k], g = guardados[k] || {};
+      return `
+        <div class="acc-row" data-pig="${k}">
+          <div style="font-size:13px;font-weight:700;color:var(--gold-light);padding:2px 2px 0">${pg.nombre}</div>
+          <div class="acc-nums" style="grid-template-columns:1fr 1fr">
+            <div><label>Pagaste el frasco ($)</label><input type="text" class="pig-precio num" inputmode="decimal" placeholder="$" value="${escapeHtml(g.precio || '')}" /></div>
+            <div><label>Trae (${pg.unidad})</label><input type="text" class="pig-frasco num" inputmode="decimal" placeholder="${pg.ej}" value="${escapeHtml(g.frasco || '')}" /></div>
+          </div>
+        </div>`;
+    }).join('');
+    document.getElementById('pig-hint').classList.toggle('hidden', !claves.length);
+    pintarRecetaMarmol();
+  }
+
+  // Receta Sebrox del efecto mármol: base de 110 g de mezcla, se escala a cualquier tamaño
+  const MARMOL_BASE = 110;
+  const MARMOL_VASOS = [
+    { nombre: 'Vaso 1', pig: 'Pigmento metalizado en polvo', g: 17 },
+    { nombre: 'Vaso 2', pig: 'Traslúcido', g: 12 },
+    { nombre: 'Vaso 3', pig: 'Metalizado en polvo para vetas', g: 11 }
+  ];
+
+  function pintarRecetaMarmol() {
+    const el = document.getElementById('marmol-receta');
+    if (efecto !== 'marmol') { el.innerHTML = ''; return; }
+    const cargados = parseDec(document.getElementById('p-gramos').value);
+    const total = cargados > 0 ? cargados : MARMOL_BASE;
+    const dec = total < 50 ? 1 : 0;  // piezas chicas con un decimal
+    const redondear = n => Math.round(n * 10 ** dec) / 10 ** dec;
+    const vasos = MARMOL_VASOS.map(v => ({ ...v, gr: redondear(total * v.g / MARMOL_BASE) }));
+    const predominante = redondear(total - vasos.reduce((s, v) => s + v.gr, 0));
+    const fila = (vaso, pig, gr, destacado) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div><div style="font-size:13px;color:${destacado ? 'var(--gold-light)' : 'rgba(255,255,255,0.75)'};font-weight:${destacado ? 700 : 400}">${vaso}</div>
+        <div style="font-size:11px;color:rgba(201,169,110,0.65)">${pig}</div></div>
+        <div style="font-family:var(--serif);font-size:18px;font-weight:700;color:var(--gold-light);white-space:nowrap">${fmtNum(gr)} g</div>
+      </div>`;
+    el.innerHTML = `
+      <div style="margin-top:12px;padding:16px;border-radius:14px;border:1px solid rgba(201,169,110,0.3);background:linear-gradient(135deg,rgba(201,169,110,0.1),rgba(139,94,42,0.06))">
+        <div class="section-label">🧪 Receta Sebrox · Efecto mármol</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin:4px 0 6px">
+          ${cargados > 0
+            ? `Para tus <strong style="color:var(--gold-light)">${fmtNum(total)} g</strong> de mezcla, dividila así:`
+            : `Base de <strong style="color:var(--gold-light)">110 g</strong> de mezcla. Cargá los gramos de resina arriba y la receta se ajusta sola a tu pieza.`}
+        </div>
+        ${fila('Vaso predominante', 'Mezcla con pigmento sólido / pleno', predominante, true)}
+        ${vasos.map(v => fila(v.nombre, v.pig, v.gr)).join('')}
+        <div style="font-size:11px;color:rgba(201,169,110,0.6);margin-top:10px;line-height:1.5">Los gramos son de mezcla de resina (A + B) en cada vaso. Primero armá los vasos 1, 2 y 3; lo que sobra va al predominante.</div>
+      </div>`;
+  }
+
+  // Devuelve { costo } o { error }
+  function calcularPigmentos(gramosResina) {
+    const ef = EFECTOS[efecto];
+    let costo = 0;
+    for (const k of Object.keys(ef.uso)) {
+      const row = document.querySelector(`#pig-fields .acc-row[data-pig="${k}"]`);
+      const precio = parseMoney(row.querySelector('.pig-precio').value);
+      const frasco = parseDec(row.querySelector('.pig-frasco').value);
+      if (!(precio >= 0) || !(frasco > 0)) return { error: `Completá lo que pagaste y cuánto trae el frasco de ${PIGMENTOS[k].nombre}, o elegí "Sin color".` };
+      const usado = gramosResina / ef.base * ef.uso[k];
+      costo += usado * precio / frasco;
+    }
+    return { costo };
+  }
+  const fmtMult = m => m.toLocaleString('es-AR');
+
+  // Escala mayorista: descuento sobre el precio del perfil elegido.
+  // Piso: nunca menos que el precio Emprendedor (costo × 3).
+  const MAYORISTA = [
+    { desde: 3, desc: 0.10 },
+    { desde: 10, desc: 0.15 },
+    { desde: 20, desc: 0.20 }
+  ];
+  const MAYORISTA_PISO_MULT = 3;
+  const PRESU_KEY = 'sebrox-presu-v1';
+
+  // Números con decimales (gramos, kg): acepta "1,5" o "1.5"
+  function parseDec(v) {
+    const n = parseFloat(String(v || '').trim().replace(',', '.'));
+    return isFinite(n) ? n : NaN;
+  }
+  // Precios en pesos: "35.000" = 35000 · "1.250,50" = 1250.5
+  function parseMoney(v) {
+    let s = String(v || '').trim().replace(/\$/g, '').replace(/\s/g, '');
+    if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+    const n = parseFloat(s);
+    return isFinite(n) ? n : NaN;
+  }
+  const fmtMoney = n => '$ ' + Math.round(n).toLocaleString('es-AR');
+  const fmtNum = n => (Math.round(n * 10) / 10).toLocaleString('es-AR');
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function addAccesorio(nombre = '', precio = '', trae = '1', usado = '1') {
+    const row = document.createElement('div');
+    row.className = 'acc-row';
+    row.innerHTML = `
+      <div class="acc-top">
+        <input type="text" class="acc-nombre" placeholder="Material (ej: Argollas)" value="${escapeHtml(nombre)}" />
+        <button type="button" class="acc-del" aria-label="Quitar" onclick="this.closest('.acc-row').remove()">✕</button>
+      </div>
+      <div class="acc-nums">
+        <div><label>Pagaste ($)</label><input type="text" class="acc-precio num" inputmode="decimal" placeholder="$" value="${escapeHtml(precio)}" /></div>
+        <div><label>Trae</label><input type="text" class="acc-trae num" inputmode="decimal" value="${escapeHtml(trae)}" /></div>
+        <div><label>Usaste</label><input type="text" class="acc-cant num" inputmode="decimal" value="${escapeHtml(usado)}" /></div>
+      </div>
+      <div class="acc-calc"></div>`;
+    row.addEventListener('input', () => calcFila(row));
+    document.getElementById('acc-list').appendChild(row);
+    calcFila(row);
+  }
+
+  // Costo de un material: lo pagado ÷ unidades que trae × unidades usadas
+  function leerFila(row) {
+    const n = row.querySelector('.acc-nombre').value.trim();
+    const pRaw = row.querySelector('.acc-precio').value.trim();
+    const tRaw = row.querySelector('.acc-trae').value.trim();
+    const uRaw = row.querySelector('.acc-cant').value.trim();
+    return {
+      vacia: !n && !pRaw,
+      nombre: n || 'Material',
+      precio: parseMoney(pRaw),
+      trae: tRaw === '' ? 1 : parseDec(tRaw),
+      usado: uRaw === '' ? 1 : parseDec(uRaw)
+    };
+  }
+
+  function calcFila(row) {
+    const f = leerFila(row);
+    const out = row.querySelector('.acc-calc');
+    if (f.vacia || !(f.precio >= 0) || !(f.trae > 0) || !(f.usado > 0)) { out.textContent = ''; return; }
+    const total = f.precio / f.trae * f.usado;
+    out.textContent = f.trae === 1
+      ? `= ${fmtMoney(total)}`
+      : `${fmtMoney(f.precio / f.trae)} c/u · usaste ${fmtNum(f.usado)} = ${fmtMoney(total)}`;
+  }
+
+  function refreshUseCalcBtn() {
+    const btn = document.getElementById('use-calc-btn');
+    if (lastResinGrams) {
+      btn.textContent = `↙ Usar lo calculado en la calculadora (${fmtNum(lastResinGrams)} g)`;
+      btn.classList.remove('hidden');
+    } else {
+      btn.classList.add('hidden');
+    }
+  }
+
+  function usarCalculo() {
+    if (lastResinGrams) document.getElementById('p-gramos').value = String(lastResinGrams).replace('.', ',');
+    pintarRecetaMarmol();
+  }
+
+  function guardarKit() {
+    try {
+      localStorage.setItem(PRESU_KEY, JSON.stringify({
+        size: document.getElementById('p-kit-size').value,
+        unit: document.getElementById('p-kit-unit').value,
+        price: document.getElementById('p-kit-price').value,
+        tipo: tipoPieza
+      }));
+    } catch (e) {}
+  }
+
+  function cargarKit() {
+    try {
+      const d = JSON.parse(localStorage.getItem(PRESU_KEY) || 'null');
+      if (!d) return;
+      if (d.size) document.getElementById('p-kit-size').value = d.size;
+      if (d.unit) document.getElementById('p-kit-unit').value = d.unit;
+      if (d.price) document.getElementById('p-kit-price').value = d.price;
+      if (d.tipo && MULTS[d.tipo]) elegirTipo(d.tipo);
+    } catch (e) {}
+  }
+
+  function calcularPresupuesto() {
+    const nombre = document.getElementById('p-nombre').value.trim();
+    const cantRaw = document.getElementById('p-cant').value.trim();
+    const cant = cantRaw === '' ? 1 : parseInt(cantRaw, 10);
+    const gramos = parseDec(document.getElementById('p-gramos').value);
+    const kitSize = parseDec(document.getElementById('p-kit-size').value);
+    const kitUnit = document.getElementById('p-kit-unit').value;
+    const kitPrice = parseMoney(document.getElementById('p-kit-price').value);
+
+    if (!cant || cant < 1) { alert('La cantidad de piezas tiene que ser 1 o más.'); return; }
+    if (!(gramos > 0)) { alert('Cargá cuántos gramos de resina usaste.'); return; }
+    if (!(kitSize > 0) || !(kitPrice > 0)) { alert('Cargá el tamaño y el precio del kit de resina.'); return; }
+
+    const kitGramos = kitUnit === 'kg' ? kitSize * 1000 : kitSize;
+    const precioGramo = kitPrice / kitGramos;
+    const costoResina = gramos * precioGramo;
+
+    const accesorios = [];
+    let errorAcc = false;
+    document.querySelectorAll('#acc-list .acc-row').forEach(row => {
+      const f = leerFila(row);
+      if (f.vacia) return; // fila vacía
+      if (!(f.precio >= 0) || !(f.trae > 0) || !(f.usado > 0)) { errorAcc = true; return; }
+      accesorios.push({ ...f, total: f.precio / f.trae * f.usado });
+    });
+    if (errorAcc) { alert('Revisá lo que pagaste, cuántas trae y cuántas usaste en cada material.'); return; }
+
+    const costoAcc = accesorios.reduce((s, a) => s + a.total, 0);
+    const pig = calcularPigmentos(gramos);
+    if (pig.error) { alert(pig.error); return; }
+    guardarPig();
+    const costoPig = pig.costo;
+    const costo = costoResina + costoAcc + costoPig;
+    document.getElementById('pr-pig-row').classList.toggle('hidden', efecto === 'ninguno');
+    document.getElementById('pr-pig').textContent = fmtMoney(costoPig);
+    document.getElementById('pr-pig-note').textContent = `estimado Sebrox · ${EFECTOS[efecto].nombre}`;
+
+    guardarKit();
+
+    document.getElementById('pr-sub').textContent =
+      `${nombre || 'Trabajo'} · ${cant} ${cant === 1 ? 'pieza' : 'piezas'} · ${TIPO_NOMBRE[tipoPieza]}`;
+    document.getElementById('pr-resina').textContent = fmtMoney(costoResina);
+    const kitTxt = kitUnit === 'kg' ? `${fmtNum(kitSize)} kg` : `${fmtNum(kitSize)} g`;
+    document.getElementById('pr-resina-note').textContent =
+      `Usaste ${fmtNum(gramos)} g · kit de ${kitTxt} a ${fmtMoney(kitPrice)} (el kg te sale ${fmtMoney(precioGramo * 1000)})`;
+    document.getElementById('pr-acc').textContent = fmtMoney(costoAcc);
+    document.getElementById('pr-acc-note').textContent =
+      accesorios.length ? 'detalle de cada uno abajo' : 'sin accesorios';
+    document.getElementById('pr-acc-detalle').innerHTML = accesorios.map(a => `
+      <div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0 5px 12px;border-left:2px solid rgba(201,169,110,0.25);margin:2px 0">
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${escapeHtml(a.nombre)} <span style="color:rgba(201,169,110,0.55)">· ${a.trae === 1
+          ? `${fmtNum(a.usado)} × ${fmtMoney(a.precio)}`
+          : `usaste ${fmtNum(a.usado)} de ${fmtNum(a.trae)} (pagaste ${fmtMoney(a.precio)})`}</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);white-space:nowrap">${fmtMoney(a.total)}</div>
+      </div>`).join('');
+    document.getElementById('pr-costo').textContent = fmtMoney(costo);
+    const opciones = PERFILES.map((pf, i) => {
+      const mult = MULTS[tipoPieza][i];
+      const precio = costo * mult;
+      return { ...pf, mult, precio, precioUnit: precio / cant, manoObra: costo * (mult - 2) };
+    });
+    const min = opciones[0], max = opciones[opciones.length - 1];
+    const porPieza = cant > 1;
+    document.getElementById('pr-rango').textContent =
+      `${fmtMoney(porPieza ? min.precioUnit : min.precio)} a ${fmtMoney(porPieza ? max.precioUnit : max.precio)}`;
+    document.getElementById('pr-rango-sub').textContent = porPieza
+      ? `por pieza · ${cant} piezas: ${fmtMoney(min.precio)} a ${fmtMoney(max.precio)}`
+      : 'precio de venta';
+
+    lastPresupuesto = { nombre, cant, costo, opciones, sel: PERFIL_DEFAULT };
+    pintarPerfiles();
+
+    const card = document.getElementById('presu-result');
+    card.classList.remove('hidden');
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+
+  function pintarPerfiles() {
+    const p = lastPresupuesto;
+    if (!p) return;
+    document.getElementById('perfiles').innerHTML = p.opciones.map((o, i) => `
+      <button type="button" class="perfil${i === p.sel ? ' active' : ''}" onclick="elegirPerfil(${i})">
+        <div class="pf-top">
+          <div><span class="pf-name">${o.nombre}</span><span class="pf-mult">× ${fmtMult(o.mult)}</span></div>
+          <div class="pf-price">${fmtMoney(p.cant > 1 ? o.precioUnit : o.precio)}</div>
+        </div>
+        <div class="pf-desc">${o.desc}</div>
+        <div class="pf-detail">Tu mano de obra: ${fmtMoney(o.manoObra)}${p.cant > 1 ? ` · Total ${p.cant} piezas: ${fmtMoney(o.precio)}` : ''}</div>
+      </button>`).join('');
+    pintarMayorista();
+  }
+
+  function pintarMayorista() {
+    const p = lastPresupuesto;
+    const el = document.getElementById('mayorista');
+    if (!p) { el.innerHTML = ''; return; }
+    const o = p.opciones[p.sel];
+    const costoUnit = p.costo / p.cant;
+    const base = costoUnit * o.mult;
+    const piso = costoUnit * MAYORISTA_PISO_MULT;
+    const fila = (txt, precio, extra) => `
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="font-size:13px;color:rgba(255,255,255,0.7)">${txt}${extra ? `<span style="font-size:10px;color:rgba(201,169,110,0.6);margin-left:6px">${extra}</span>` : ''}</div>
+        <div style="font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gold-light);white-space:nowrap">${fmtMoney(precio)} <span style="font-family:var(--sans);font-size:10px;font-weight:400;color:rgba(255,255,255,0.35)">c/u</span></div>
+      </div>`;
+    let filas = fila(`1 a ${MAYORISTA[0].desde - 1} unidades`, base, 'precio normal');
+    MAYORISTA.forEach((t, i) => {
+      const hasta = MAYORISTA[i + 1] ? ` a ${MAYORISTA[i + 1].desde - 1}` : ' o más';
+      const conDesc = base * (1 - t.desc);
+      const enPiso = conDesc < piso;
+      filas += fila(`${t.desde}${hasta} unidades`, Math.max(conDesc, piso), enPiso ? 'precio mínimo' : `−${Math.round(t.desc * 100)}%`);
+    });
+    const tieneMargen = o.mult > MAYORISTA_PISO_MULT;
+    const nota = tieneMargen
+      ? 'Descuento sobre tu perfil ' + o.nombre + '. Nunca baja del precio Emprendedor, así siempre te queda mano de obra.'
+      : 'Con el perfil Emprendedor ya estás en el precio mínimo, así que no queda margen para descuento por cantidad. Elegí otro perfil para ver la escala.';
+
+    // Revendedor: paga el precio Emprendedor (× 3) y revende al precio del perfil elegido
+    const gananciaLocal = base - piso;
+    const margenLocal = Math.round((1 - MAYORISTA_PISO_MULT / o.mult) * 100);
+    const notaReventa = tieneMargen
+      ? `Si el local lo vende a tu precio ${o.nombre} (${fmtMoney(base)}), gana ${fmtMoney(gananciaLocal)} por pieza (${margenLocal}%). Un local suele buscar alrededor del 50%: cuanto más alto tu perfil, más atractivo es para revender.`
+      : 'Con el perfil Emprendedor tu precio al público y el de revendedor son iguales, así que al local no le queda ganancia. Para venderle a locales, elegí Profesional o Premium.';
+
+    const caja = (titulo, sub, cuerpo, notaTxt) => `
+      <div style="padding:16px;border-radius:14px;border:1px solid rgba(201,169,110,0.2);background:rgba(0,0,0,0.2);margin-top:12px">
+        <div class="section-label">${titulo}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin:4px 0 6px">${sub}</div>
+        ${cuerpo}
+        <div style="font-size:11px;color:rgba(201,169,110,0.6);margin-top:10px;line-height:1.5">${notaTxt}</div>
+      </div>`;
+
+    el.innerHTML =
+      caja('📦 Pedidos por cantidad', 'Solo para vos: para un cliente que te encarga varias piezas para él (regalos, eventos, souvenirs).',
+        tieneMargen ? filas : '', nota) +
+      caja('🏪 Precio para revendedores', 'Solo para vos: para un local o revendedor que compra para revender.',
+        tieneMargen ? fila('Precio revendedor', piso, '× 3') : '', notaReventa);
+  }
+
+  function elegirPerfil(i) {
+    if (!lastPresupuesto) return;
+    lastPresupuesto.sel = i;
+    pintarPerfiles();
+  }
+
+  function compartirPresupuesto() {
+    if (!lastPresupuesto) return;
+    const p = lastPresupuesto;
+    const o = p.opciones[p.sel];
+    let txt = `*Presupuesto*\n${p.nombre || 'Trabajo en resina epoxi'}\n`;
+    if (p.cant > 1) {
+      txt += `Cantidad: ${p.cant} piezas\nPrecio por unidad: ${fmtMoney(o.precioUnit)}\nTotal: ${fmtMoney(o.precio)}`;
+    } else {
+      txt += `Precio: ${fmtMoney(o.precio)}`;
+    }
+    if (navigator.share) {
+      navigator.share({ text: txt }).catch(() => {});
+    } else {
+      window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+    }
+  }
+
+  function nuevoPresupuesto() {
+    document.getElementById('p-nombre').value = '';
+    document.getElementById('p-cant').value = '1';
+    document.getElementById('p-gramos').value = '';
+    document.getElementById('acc-list').innerHTML = '';
+    addAccesorio();
+    lastPresupuesto = null;
+    document.getElementById('presu-result').classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  addAccesorio();
+  cargarKit();
+  elegirEfecto(EFECTOS[leerPigGuardados().efecto] ? leerPigGuardados().efecto : 'ninguno');
+  document.getElementById('p-gramos').addEventListener('input', pintarRecetaMarmol);
+
+  // ─── CÓDIGO DE ACCESO ────────────────────────────────────
+  // Link de pago de Mercado Pago del Presupuestador Inteligente ($19.200, precio de lanzamiento)
+  const MP_LINK_PRESU = 'https://mpago.la/2kXf5yK';
+  (function () {
+    const a = document.getElementById('mp-link');
+    if (MP_LINK_PRESU) a.href = MP_LINK_PRESU;
+    else a.addEventListener('click', e => { e.preventDefault(); alert('El pago todavía no está habilitado.'); });
+  })();
+
+  const UNLOCK_KEY = 'sebrox-presu-unlock';
+  const CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const CODE_K = ['o8XM6P92', '4acWfJNy', '3EMu1nMH'].join('');
+
+  function cyrb53(str, seed = 0) {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0, ch; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+  }
+  function codeSig(id) {
+    let n = cyrb53(CODE_K + '|' + id), s = '';
+    for (let i = 0; i < 4; i++) { s += CODE_ABC[n % 32]; n = Math.floor(n / 32); }
+    return s;
+  }
+  function normalizarCodigo(v) {
+    let s = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (s.startsWith('SBX')) s = s.slice(3);
+    return s;
+  }
+  function codigoValido(v) {
+    const s = normalizarCodigo(v);
+    if (s.length !== 8) return false;
+    for (const c of s) if (!CODE_ABC.includes(c)) return false;
+    return codeSig(s.slice(0, 4)) === s.slice(4);
+  }
+  function aplicarBloqueo() {
+    let ok = false;
+    try { ok = codigoValido(localStorage.getItem(UNLOCK_KEY)); } catch (e) {}
+    if (!ok && window.__presuUnlocked) ok = true;
+    document.getElementById('presu-lock').classList.toggle('hidden', ok);
+    document.getElementById('presu-content').classList.toggle('hidden', !ok);
+  }
+  function desbloquear() {
+    const v = document.getElementById('lock-code').value;
+    const err = document.getElementById('lock-error');
+    if (!codigoValido(v)) { err.classList.remove('hidden'); return; }
+    err.classList.add('hidden');
+    window.__presuUnlocked = true;
+    try { localStorage.setItem(UNLOCK_KEY, normalizarCodigo(v)); } catch (e) {}
+    aplicarBloqueo();
+  }
+  document.getElementById('lock-code').addEventListener('keydown', e => { if (e.key === 'Enter') desbloquear(); });
+  aplicarBloqueo();
 
   // ─── PWA INSTALL ─────────────────────────────────────────
   let deferredPrompt = null;
