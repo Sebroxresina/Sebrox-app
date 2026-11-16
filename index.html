@@ -338,6 +338,11 @@
     section:first-child { margin-top: 32px; }
 
     .hidden { display: none !important; }
+    .pdf-listo { margin-top: 14px; padding: 14px; border: 1px solid var(--gold-light); border-radius: 14px; background: rgba(201,169,110,0.12); display: grid; gap: 10px; }
+    .pdf-listo .pl-tit { font-weight: 700; color: var(--gold-light); font-size: 15px; }
+    .pdf-listo .pl-tit span { font-weight: 400; opacity: .8; font-size: 13px; }
+    .pdf-listo .pl-nota { font-size: 12.5px; opacity: .8; }
+    .pdf-listo .action-btn { width: 100%; }
 
     /* TABS */
     .tabs {
@@ -983,8 +988,14 @@
             </div>
           </div>
           <div class="action-row">
-            <button class="action-btn primary" id="vin-pdf-btn" onclick="descargarPDF()">📄 Descargar PDF</button>
+            <button class="action-btn primary" id="vin-pdf-btn" onclick="descargarPDF()">📄 Armar PDF</button>
             <button class="action-btn ghost" onclick="vaciarPlancha()">Vaciar plancha</button>
+          </div>
+          <div id="vin-pdf-listo" class="pdf-listo hidden" role="status">
+            <div class="pl-tit">✅ PDF listo <span id="vin-pdf-peso"></span></div>
+            <button type="button" class="action-btn primary" onclick="enviarPDF()">📲 Enviar el PDF (WhatsApp, mail…)</button>
+            <button type="button" class="action-btn ghost" onclick="guardarPDF()">⬇️ Guardar el PDF</button>
+            <div class="pl-nota">Se manda el archivo PDF con tu plancha, no un enlace.</div>
           </div>
           <div class="tip-box">
             💡 <strong>En la gráfica:</strong> pedí que lo impriman en vinilo <strong>al 100% / tamaño real</strong>, sin ajustar a la página. <span id="vin-tip-sep">Las imágenes tienen 3 mm de separación para que puedas recortarlas.</span>
@@ -2029,6 +2040,7 @@
   let vinCalidadPDF = 'normal';
   try { if (CAL_PDF[localStorage.getItem('sebrox-cal-pdf')]) vinCalidadPDF = localStorage.getItem('sebrox-cal-pdf'); } catch (e) {}
   function elegirCalidadPDF(c) {
+    if (c !== vinCalidadPDF) ocultarPdfListo();
     vinCalidadPDF = c;
     document.querySelectorAll('.vin-calpdf').forEach(b => b.classList.toggle('active', b.dataset.cal === c));
     try { localStorage.setItem('sebrox-cal-pdf', c); } catch (e) {}
@@ -2513,6 +2525,7 @@
   function vaciarPlancha() { plancha = []; pintarPlancha(); }
 
   function pintarPlancha() {
+    ocultarPdfListo();
     elegirCalidadPDF(vinCalidadPDF);
     const sec = document.getElementById('vin-plancha');
     sec.classList.toggle('hidden', !plancha.length);
@@ -2588,8 +2601,57 @@
     return new Blob(partes.map(p => typeof p === 'string' ? new TextEncoder().encode(p) : p), { type: 'application/pdf' });
   }
 
+  // ── PDF listo: enviar (archivo, no enlace) o guardar ──
+  let vinPdf = null;
+  function esCelular() {
+    return /android|iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+  function esIOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+  function ocultarPdfListo() {
+    vinPdf = null;
+    const p = document.getElementById('vin-pdf-listo'); if (p) p.classList.add('hidden');
+  }
+  function canvasAJpeg(c, calidad) {
+    return new Promise((ok, mal) => c.toBlob(b => {
+      if (!b) return mal(new Error('jpeg'));
+      b.arrayBuffer().then(buf => ok(new Uint8Array(buf)), mal);
+    }, 'image/jpeg', calidad));
+  }
+  function puedeCompartir(f) {
+    try { return !!(navigator.canShare && navigator.share && navigator.canShare({ files: [f] })); } catch (e) { return false; }
+  }
+  function bajarArchivo(f) {
+    const url = URL.createObjectURL(f);
+    const a = document.createElement('a');
+    a.href = url; a.download = f.name; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  }
+  async function enviarPDF() {
+    if (!vinPdf) return;
+    if (puedeCompartir(vinPdf)) {
+      try { await navigator.share({ files: [vinPdf], title: 'Plancha de vinilo SEBROX' }); }
+      catch (e) { if (!e || e.name !== 'AbortError') alert('No se pudo abrir el menú para enviar. Tocá "Guardar el PDF" y mandalo desde tus archivos.'); }
+      return;
+    }
+    alert('Este navegador no deja mandar archivos directo. Se va a guardar el PDF: después adjuntalo en WhatsApp o en el mail.');
+    bajarArchivo(vinPdf);
+  }
+  function guardarPDF() {
+    if (!vinPdf) return;
+    // En iPhone la forma segura de guardarlo es el menú de compartir → "Guardar en Archivos"
+    if (esIOS() && puedeCompartir(vinPdf)) {
+      navigator.share({ files: [vinPdf], title: 'Plancha de vinilo SEBROX' }).catch(() => {});
+      return;
+    }
+    bajarArchivo(vinPdf);
+  }
+
   async function descargarPDF() {
     if (!plancha.length) return;
+    ocultarPdfListo();
     const btn = document.getElementById('vin-pdf-btn');
     const txt = btn.textContent;
     btn.disabled = true; btn.textContent = 'Armando el PDF…';
@@ -2613,7 +2675,7 @@
           const cx = c.getContext('2d');
           cx.translate(0, -y0);
           dibujarAjustado(cx, it.img, pw, ph, it.ajuste);
-          imagenes.push({ bytes: dataURLaBytes(c.toDataURL('image/jpeg', CAL_PDF[vinCalidadPDF])), pw, ph: hs });
+          imagenes.push({ bytes: await canvasAJpeg(c, CAL_PDF[vinCalidadPDF]), pw, ph: hs });
           franjas.push({ img: imagenes.length - 1, y0, y1: y0 + hs });
           c.width = c.height = 1;
           await new Promise(r => setTimeout(r, 0));
@@ -2632,11 +2694,15 @@
         });
       }
       const blob = armarPDF(PLANCHA_MM, PLANCHA_MM, imagenes, colocaciones);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = vinCalidadPDF === 'maxima' ? 'plancha-vinilo-sebrox-maxima.pdf' : 'plancha-vinilo-sebrox.pdf';
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      const nombre = vinCalidadPDF === 'maxima' ? 'plancha-vinilo-sebrox-maxima.pdf' : 'plancha-vinilo-sebrox.pdf';
+      vinPdf = new File([blob], nombre, { type: 'application/pdf' });
+      const mb = blob.size / 1048576;
+      document.getElementById('vin-pdf-peso').textContent = '· ' + (mb >= 1 ? fmtNum(mb) + ' MB' : Math.max(1, Math.round(blob.size / 1024)) + ' KB');
+      const panel = document.getElementById('vin-pdf-listo');
+      panel.classList.remove('hidden');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // En la compu se descarga solo; en el celular se elige desde el panel (enviar o guardar)
+      if (!esCelular()) bajarArchivo(vinPdf);
     } catch (e) {
       alert('No se pudo armar el PDF. Probá con menos imágenes o cerrá otras apps e intentá de nuevo.');
     } finally {
