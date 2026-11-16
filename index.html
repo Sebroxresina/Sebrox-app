@@ -461,6 +461,11 @@
     .vin-calidad.ok { background: rgba(168,213,162,0.12); color: #a8d5a2; }
     .vin-calidad.media { background: rgba(232,213,176,0.12); color: var(--gold-light); }
     .vin-calidad.baja { background: rgba(232,160,122,0.14); color: #e8a07a; }
+    .vb-row { margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.7); }
+    .vb-chips { display: flex; gap: 6px; margin-top: 6px; }
+    .vb-chip { flex: 1; padding: 9px 4px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .vb-chip.active { border-color: var(--gold); background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(139,94,42,0.15)); color: var(--gold-light); }
+    .vb-nota { margin-top: 8px; font-size: 11px; line-height: 1.5; color: rgba(201,169,110,0.7); }
     .vin-plancha-canvas { width: 100%; aspect-ratio: 1; background: #fff; border-radius: 4px; display: block; }
     .vin-item { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .vin-item img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; background: #fff; }
@@ -914,7 +919,7 @@
 
       <div class="field">
         <label>Medida</label>
-        <div id="vin-medidas" class="tipo-grid" style="grid-template-columns:1fr 1fr 1fr"></div>
+        <div id="vin-medidas" class="tipo-grid" style="grid-template-columns:1fr 1fr"></div>
         <button type="button" class="use-calc-btn" onclick="girarMedida()">↻ Girar (horizontal / vertical)</button>
       </div>
 
@@ -928,6 +933,11 @@
             <div class="tb-title">Entera</div><div class="tb-desc">Con márgenes blancos</div>
           </button>
         </div>
+      </div>
+
+      <div class="field">
+        <label>Bordes de la plancha</label>
+        <div class="vin-bordes"></div>
       </div>
 
       <div id="vin-calidad" class="vin-calidad"></div>
@@ -952,6 +962,14 @@
         <div class="result-body">
           <canvas id="vin-plancha-canvas" class="vin-plancha-canvas"></canvas>
           <div id="vin-ocupacion" class="input-hint" style="text-align:center;margin-top:8px"></div>
+          <div class="action-row" style="grid-template-columns:1fr;margin-top:12px">
+            <button type="button" class="action-btn ghost" id="vin-opt-btn" onclick="optimizarPlancha()">✨ Optimizar espacio</button>
+          </div>
+          <div id="vin-opt-msg" class="input-hint" style="text-align:center"></div>
+          <div class="field" style="margin-top:14px">
+            <label>Bordes de la plancha</label>
+            <div class="vin-bordes"></div>
+          </div>
           <div id="vin-items"></div>
           <div class="field" style="margin-top:16px">
             <label>Calidad del PDF</label>
@@ -969,7 +987,7 @@
             <button class="action-btn ghost" onclick="vaciarPlancha()">Vaciar plancha</button>
           </div>
           <div class="tip-box">
-            💡 <strong>En la gráfica:</strong> pedí que lo impriman en vinilo <strong>al 100% / tamaño real</strong>, sin ajustar a la página. Las imágenes tienen 3 mm de separación para que puedas recortarlas.
+            💡 <strong>En la gráfica:</strong> pedí que lo impriman en vinilo <strong>al 100% / tamaño real</strong>, sin ajustar a la página. <span id="vin-tip-sep">Las imágenes tienen 3 mm de separación para que puedas recortarlas.</span>
           </div>
         </div>
       </div>
@@ -1983,10 +2001,21 @@
   const VIN_MEDIDAS = [
     { nombre: 'Chico', w: 20, h: 25 },
     { nombre: 'Mediano', w: 30, h: 50 },
-    { nombre: 'Grande', w: 40, h: 70 }
+    { nombre: 'Grande', w: 40, h: 70 },
+    { nombre: '', w: 40.5, h: 30.5 }
   ];
   const PLANCHA_MM = 1000;   // plancha de 100 × 100 cm
-  const SEP_MM = 3;          // separación entre imágenes y margen exterior
+  // Bordes de la plancha (en mm): separación entre imágenes y margen contra el borde. Se eligen en la app.
+  const SEP_OPCIONES = [0, 2, 3, 5];
+  const MARGEN_OPCIONES = [0, 3, 5, 10];
+  let vinSep = 3, vinMargen = 3;
+  try {
+    const b = JSON.parse(localStorage.getItem('sebrox-vin-bordes') || 'null');
+    if (b && SEP_OPCIONES.includes(b.sep) && MARGEN_OPCIONES.includes(b.margen)) { vinSep = b.sep; vinMargen = b.margen; }
+  } catch (e) {}
+  // Lado útil para acomodar: cada imagen lleva su separación a la derecha y abajo
+  const ladoUtil = () => PLANCHA_MM - 2 * vinMargen + vinSep;
+  let layoutOptimo = null;   // acomodo guardado (vale mientras la plancha y los bordes no cambien)
   const PDF_DPI = 300;       // resolución de impresión
   const MAX_PX = 16000000;   // límite de tamaño de imagen en celulares (iPhone)
 
@@ -2011,7 +2040,7 @@
     const ok = presuDesbloqueado();
     document.getElementById('vin-lock').classList.toggle('hidden', ok);
     document.getElementById('vin-content').classList.toggle('hidden', !ok);
-    if (ok) cargarGaleria();
+    if (ok) { pintarBordes(); cargarGaleria(); }
   }
 
   const nombreLindo = archivo => {
@@ -2142,7 +2171,7 @@
     document.getElementById('vin-medidas').innerHTML = VIN_MEDIDAS.map((m, i) => {
       const w = vinGirada ? m.h : m.w, h = vinGirada ? m.w : m.h;
       return `<button type="button" class="tipo-btn${i === vinMedida ? ' active' : ''}" data-medida="${i}" onclick="elegirMedida(${i})">
-        <div class="tb-title">${m.nombre}</div><div class="tb-desc">${fmtNum(w)} × ${fmtNum(h)} cm</div></button>`;
+        ${m.nombre ? `<div class="tb-title">${m.nombre}</div><div class="tb-desc">${fmtNum(w)} × ${fmtNum(h)} cm</div>` : `<div class="tb-title">${fmtNum(w)} × ${fmtNum(h)} cm</div>`}</button>`;
     }).join('');
   }
   function elegirMedida(i) { vinMedida = i; pintarMedidas(); actualizarEditor(); }
@@ -2269,38 +2298,38 @@
   }
 
   // Devuelve la posición de cada imagen (en mm, con giro) o null si no entran todas
-  function empaquetar(rects) {
+  function empaquetar(rects, intentos = 60) {
     if (!rects.length) return [];
-    const W = PLANCHA_MM - SEP_MM, H = PLANCHA_MM - SEP_MM;  // cada imagen lleva su separación a la derecha y abajo
+    const S = vinSep, M = vinMargen, W = ladoUtil(), H = W;
     // Misma medida (aunque algunas estén paradas y otras acostadas)
     const a0 = Math.min(rects[0].w, rects[0].h), b0 = Math.max(rects[0].w, rects[0].h);
     const misma = rects.every(r => Math.min(r.w, r.h) === a0 && Math.max(r.w, r.h) === b0);
     if (misma) {
-      const lay = layoutUniforme(a0 + SEP_MM, b0 + SEP_MM, W, H);
+      const lay = layoutUniforme(a0 + S, b0 + S, W, H);
       if (rects.length <= lay.length) {
         // Cada imagen va primero a un lugar con su misma orientación, así se gira lo menos posible
         const usado = new Array(lay.length).fill(false), pos = new Array(rects.length);
         const asignar = (i, s) => {
           usado[s] = true;
-          const L = lay[s], rot = !(L.w - SEP_MM === rects[i].w && L.h - SEP_MM === rects[i].h);
-          pos[i] = { x: SEP_MM + L.x, y: SEP_MM + L.y, w: L.w - SEP_MM, h: L.h - SEP_MM, rot };
+          const L = lay[s], rot = !(L.w - S === rects[i].w && L.h - S === rects[i].h);
+          pos[i] = { x: M + L.x, y: M + L.y, w: L.w - S, h: L.h - S, rot };
         };
         rects.forEach((r, i) => {
-          const s = lay.findIndex((L, j) => !usado[j] && L.w - SEP_MM === r.w && L.h - SEP_MM === r.h);
+          const s = lay.findIndex((L, j) => !usado[j] && L.w - S === r.w && L.h - S === r.h);
           if (s >= 0) asignar(i, s);
         });
         rects.forEach((r, i) => { if (!pos[i]) asignar(i, usado.indexOf(false)); });
         return pos;
       }
     }
-    const base = rects.map((r, i) => ({ w: r.w + SEP_MM, h: r.h + SEP_MM, i }));
+    const base = rects.map((r, i) => ({ w: r.w + S, h: r.h + S, i }));
     const ordenes = [
       base.slice().sort((a, b) => Math.max(b.w, b.h) - Math.max(a.w, a.h) || b.w * b.h - a.w * a.h),
       base.slice().sort((a, b) => b.w * b.h - a.w * a.h)
     ];
     const convertir = res => {
       const pos = new Array(rects.length);
-      res.forEach(p => { pos[p.i] = { x: SEP_MM + p.x, y: SEP_MM + p.y, w: p.w - SEP_MM, h: p.h - SEP_MM, rot: p.rot }; });
+      res.forEach(p => { pos[p.i] = { x: M + p.x, y: M + p.y, w: p.w - S, h: p.h - S, rot: p.rot }; });
       return pos;
     };
     const HEURS = ['lado', 'abajo', 'area'];
@@ -2313,11 +2342,11 @@
     // Si no entró, prueba más órdenes (mezclados siempre igual, así el resultado no cambia entre pruebas)
     const area = base.reduce((s, r) => s + r.w * r.h, 0);
     if (area > W * H) return null;
-    const clave = base.map(r => r.w + 'x' + r.h).join(',');
+    const clave = [S, M, intentos].join('|') + ':' + base.map(r => r.w + 'x' + r.h).join(',');
     if (cacheNoEntra.has(clave)) return null;
     let semilla = 12345;
     const azar = () => (semilla = (semilla * 1103515245 + 12345) % 2147483648) / 2147483648;
-    for (let intento = 0; intento < 60; intento++) {
+    for (let intento = 0; intento < intentos; intento++) {
       const orden = ordenes[intento % 2].slice();
       for (let i = orden.length - 1; i > 0; i--) { const j = Math.floor(azar() * (i + 1)); [orden[i], orden[j]] = [orden[j], orden[i]]; }
       for (const heur of HEURS) {
@@ -2328,16 +2357,114 @@
     cacheNoEntra.add(clave);
     return null;
   }
+
+  // ── Optimizar espacio: prueba muchos acomodos y se queda con el que deja el lugar libre más grande y junto ──
+  function puntajeAcomodo(pos) {
+    const S = vinSep, M = vinMargen, W = ladoUtil();
+    let mx = 0, my = 0;
+    pos.forEach(p => { mx = Math.max(mx, p.x - M + p.w + S); my = Math.max(my, p.y - M + p.h + S); });
+    const libre = Math.max(W * (W - my), W * (W - mx));   // franja libre de abajo o de la derecha
+    return libre * 1e7 - mx * my;
+  }
+  function acomodoCompacto(rects, ms) {
+    const S = vinSep, M = vinMargen, W = ladoUtil();
+    const base = rects.map((r, i) => ({ w: r.w + S, h: r.h + S, i }));
+    const convertir = res => {
+      const pos = new Array(rects.length);
+      res.forEach(p => { pos[p.i] = { x: M + p.x, y: M + p.y, w: p.w - S, h: p.h - S, rot: p.rot }; });
+      return pos;
+    };
+    let mejor = null, mejorP = -Infinity;
+    const probar = pos => { if (!pos) return; const p = puntajeAcomodo(pos); if (p > mejorP) { mejorP = p; mejor = pos; } };
+    probar(empaquetar(rects, 300));
+    const ordenes = [
+      base.slice().sort((a, b) => Math.max(b.w, b.h) - Math.max(a.w, a.h) || b.w * b.h - a.w * a.h),
+      base.slice().sort((a, b) => b.w * b.h - a.w * a.h),
+      base.slice().sort((a, b) => b.h - a.h || b.w - a.w),
+      base.slice().sort((a, b) => b.w - a.w || b.h - a.h)
+    ];
+    const HEURS = ['lado', 'abajo', 'area'];
+    ordenes.forEach(o => HEURS.forEach(h => { const r = maxRects(o, W, W, h); if (r) probar(convertir(r)); }));
+    let semilla = Date.now() % 2147483647;
+    const azar = () => (semilla = (semilla * 1103515245 + 12345) % 2147483648) / 2147483648;
+    const fin = performance.now() + ms;
+    let n = 0;
+    while (performance.now() < fin && n < 4000) {
+      const orden = ordenes[n % ordenes.length].slice();
+      for (let i = orden.length - 1; i > 0; i--) { const j = Math.floor(azar() * (i + 1)); [orden[i], orden[j]] = [orden[j], orden[i]]; }
+      const r = maxRects(orden, W, W, HEURS[n % 3]);
+      if (r) probar(convertir(r));
+      n++;
+    }
+    return mejor;
+  }
+  function claveLayout(rects) {
+    return [vinSep, vinMargen].join('|') + ':' + rects.map(r => r.w + 'x' + r.h + '#' + r.k).join(',');
+  }
+  // Posición de cada imagen de la plancha: usa el acomodo optimizado si lo hay; si no, busca uno (y si cuesta, busca más a fondo)
+  function posPlancha(rects) {
+    const clave = claveLayout(rects);
+    if (layoutOptimo && layoutOptimo.clave === clave) return layoutOptimo.pos;
+    let pos = empaquetar(rects);
+    if (!pos) { pos = empaquetar(rects, 300); if (pos) layoutOptimo = { clave, pos }; }
+    return pos;
+  }
+
+  async function optimizarPlancha() {
+    const rects = rectsPlancha();
+    if (!rects.length) return;
+    const btn = document.getElementById('vin-opt-btn');
+    const txt = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Buscando el mejor acomodo…';
+    await new Promise(r => setTimeout(r, 30));
+    const pos = acomodoCompacto(rects, 1200);
+    if (pos) layoutOptimo = { clave: claveLayout(rects), pos };
+    pintarPlancha();
+    const ult = plancha[plancha.length - 1];
+    const medida = `${fmtNum(ult.w / 10)} × ${fmtNum(ult.h / 10)} cm`;
+    const mas = maxCopias(ult.w, ult.h, 300);
+    let texto = pos
+      ? (mas > 0 ? `✨ Listo, quedó acomodada. Todavía entran ${mas} más de ${medida}.` : `✨ Listo, quedó acomodada. Con estos bordes no entra otra de ${medida}.`)
+      : '⚠️ Con estos bordes no entran todas las imágenes. Bajá la separación o el margen, o quitá alguna.';
+    if (pos && (vinSep > 0 || vinMargen > 0)) {
+      const sep0 = vinSep, mar0 = vinMargen;
+      vinSep = 0; vinMargen = 0;
+      const masSin = maxCopias(ult.w, ult.h, 300);
+      vinSep = sep0; vinMargen = mar0;
+      if (masSin > mas) texto += ` Con separación y margen en 0 mm entrarían ${masSin}.`;
+    }
+    document.getElementById('vin-opt-msg').textContent = texto;
+    btn.disabled = false; btn.textContent = txt;
+  }
+
+  // ── Bordes: separación entre imágenes y margen del borde ──
+  function pintarBordes() {
+    const chips = (tipo, ops, val) => ops.map(v =>
+      `<button type="button" class="vb-chip${v === val ? ' active' : ''}" onclick="elegirBorde('${tipo}', ${v})">${v} mm</button>`).join('');
+    const html = `
+      <div class="vb-row">Separación entre imágenes<div class="vb-chips">${chips('sep', SEP_OPCIONES, vinSep)}</div></div>
+      <div class="vb-row">Margen del borde de la plancha<div class="vb-chips">${chips('margen', MARGEN_OPCIONES, vinMargen)}</div></div>
+      <div class="vb-nota">Con menos separación entran más imágenes. En 0 mm van pegadas y la gráfica corta al ras.</div>`;
+    document.querySelectorAll('.vin-bordes').forEach(el => { el.innerHTML = html; });
+  }
+  function elegirBorde(tipo, v) {
+    if (tipo === 'sep') vinSep = v; else vinMargen = v;
+    try { localStorage.setItem('sebrox-vin-bordes', JSON.stringify({ sep: vinSep, margen: vinMargen })); } catch (e) {}
+    pintarBordes();
+    actualizarEditor();
+    if (plancha.length) pintarPlancha();
+  }
   const cacheNoEntra = new Set();
   function rectsPlancha() {
     const out = [];
     plancha.forEach((it, k) => { for (let c = 0; c < it.cant; c++) out.push({ w: it.w, h: it.h, k }); });
     return out;
   }
-  function maxCopias(wmm, hmm) {
+  function maxCopias(wmm, hmm, intentos = 60) {
     const base = rectsPlancha();
-    const entran = n => !!empaquetar(base.concat(Array(n).fill({ w: wmm, h: hmm })));
-    const tope = Math.floor((PLANCHA_MM * PLANCHA_MM) / ((wmm + SEP_MM) * (hmm + SEP_MM)));
+    const entran = n => !!empaquetar(base.concat(Array(n).fill({ w: wmm, h: hmm })), intentos);
+    const L = ladoUtil();
+    const tope = Math.floor((L * L) / ((wmm + vinSep) * (hmm + vinSep)));
     let lo = 0, hi = tope;           // búsqueda binaria de cuántas entran
     while (lo < hi) {
       const mid = Math.ceil((lo + hi) / 2);
@@ -2371,7 +2498,8 @@
     const { w, h } = medidaActual();
     const cant = parseInt(document.getElementById('vin-cant').value, 10);
     if (!(cant > 0)) { alert('Poné cuántas copias querés.'); return; }
-    const max = maxCopias(w * 10, h * 10);
+    let max = maxCopias(w * 10, h * 10);
+    if (cant > max) max = Math.max(max, maxCopias(w * 10, h * 10, 300));
     if (cant > max) { alert(max > 0 ? `En la plancha entran hasta ${max} copias más de esta medida.` : 'La plancha ya está llena para esta medida.'); return; }
     const tc = document.createElement('canvas'); tc.width = 88; tc.height = 88;
     dibujarAjustado(tc.getContext('2d'), vinSel.img, 88, 88, 'recortar');
@@ -2390,7 +2518,12 @@
     sec.classList.toggle('hidden', !plancha.length);
     if (!plancha.length) return;
     const rects = rectsPlancha();
-    const pos = empaquetar(rects) || [];
+    const posOk = posPlancha(rects);
+    const pos = posOk || [];
+    pintarBordes();
+    const msgOpt = document.getElementById('vin-opt-msg'); if (msgOpt) msgOpt.textContent = '';
+    const tip = document.getElementById('vin-tip-sep');
+    if (tip) tip.textContent = vinSep ? `Las imágenes tienen ${vinSep} mm de separación para que puedas recortarlas.` : 'Las imágenes van pegadas, sin separación: pedí que corten al ras.';
     const cv = document.getElementById('vin-plancha-canvas');
     const lado = Math.round(cv.clientWidth * (window.devicePixelRatio || 1)) || 600;
     cv.width = lado; cv.height = lado;
@@ -2405,7 +2538,9 @@
 
     const area = rects.reduce((s, r) => s + r.w * r.h, 0);
     const pct = Math.round(area / (PLANCHA_MM * PLANCHA_MM) * 100);
-    document.getElementById('vin-ocupacion').textContent = `${rects.length} ${rects.length === 1 ? 'imagen' : 'imágenes'} · usás el ${pct}% del metro`;
+    document.getElementById('vin-ocupacion').textContent = posOk
+      ? `${rects.length} ${rects.length === 1 ? 'imagen' : 'imágenes'} · usás el ${pct}% del metro`
+      : '⚠️ Con estos bordes no entran todas las imágenes. Bajá la separación o el margen, o quitá alguna.';
     document.getElementById('vin-items').innerHTML = plancha.map((it, k) => `
       <div class="vin-item">
         <img src="${it.thumb}" alt="" />
@@ -2462,8 +2597,8 @@
     try {
       const imagenes = [], colocaciones = [];
       const rects = rectsPlancha();
-      const pos = empaquetar(rects);
-      if (!pos) throw new Error('no entra');
+      const pos = posPlancha(rects);
+      if (!pos) { alert('Con estos bordes no entran todas las imágenes. Bajá la separación o el margen, o quitá alguna.'); return; }
       for (let k = 0; k < plancha.length; k++) {
         const it = plancha[k];
         // Siempre a 300 ppp reales. Si la imagen es muy grande para el celular, se arma en franjas
