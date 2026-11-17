@@ -2067,26 +2067,43 @@
     if (vinImagenes) return pintarGaleria();
     document.getElementById('vin-galeria').innerHTML = '<div class="vin-msg">Cargando imágenes…</div>';
     let lista = null, carpeta = VIN_CARPETA;
-    try {
-      const c = JSON.parse(sessionStorage.getItem('sebrox-vin-lista-2') || 'null');
-      if (c && Date.now() - c.t < 10 * 60 * 1000) { lista = c.l; carpeta = c.c; }
-    } catch (e) {}
+    // La lista se guarda en el celular 24 h (y la última que funcionó, sin vencimiento, por si todo falla)
+    const LKEY = 'sebrox-vin-lista-3';
+    let guardada = null;
+    try { guardada = JSON.parse(localStorage.getItem(LKEY) || 'null'); } catch (e) {}
+    if (guardada && Date.now() - guardada.t < 24 * 60 * 60 * 1000) { lista = guardada.l; carpeta = guardada.c; }
+    const esImg = n => /\.(jpe?g|png|webp)$/i.test(n);
+    // 1) API de GitHub (tiene límite de 60 consultas por hora por conexión)
+    async function desdeGithub() {
+      const raiz = await fetch(`https://api.github.com/repos/${VIN_REPO}/contents/`);
+      if (!raiz.ok) throw new Error('HTTP ' + raiz.status);
+      const dir = (await raiz.json()).find(f => f.type === 'dir' && /^vinilos?$/i.test(f.name));
+      if (!dir) return { l: [], c: VIN_CARPETA };
+      const r = await fetch(`https://api.github.com/repos/${VIN_REPO}/contents/${encodeURIComponent(dir.name)}`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return { l: (await r.json()).filter(f => f.type === 'file' && esImg(f.name)).map(f => f.name), c: dir.name };
+    }
+    // 2) Respaldo: jsDelivr lista los archivos del mismo repositorio, sin ese límite
+    async function desdeJsdelivr() {
+      for (const rama of ['main', 'master']) {
+        const r = await fetch(`https://data.jsdelivr.com/v1/packages/gh/${VIN_REPO}@${rama}?structure=flat`);
+        if (!r.ok) continue;
+        const files = ((await r.json()).files || []).map(f => f.name);
+        let c = null; const l = [];
+        files.forEach(n => { const m = n.match(/^\/(vinilos?)\/([^/]+)$/i); if (m && esImg(m[2])) { c = c || m[1]; l.push(m[2]); } });
+        return { l, c: c || VIN_CARPETA };
+      }
+      throw new Error('jsdelivr');
+    }
     if (!lista) {
-      try {
-        // Busca la carpeta sin importar mayúsculas: "vinilos", "Vinilos", "vinilo"…
-        const raiz = await fetch(`https://api.github.com/repos/${VIN_REPO}/contents/`);
-        if (!raiz.ok) throw new Error('HTTP ' + raiz.status);
-        const dir = (await raiz.json()).find(f => f.type === 'dir' && /^vinilos?$/i.test(f.name));
-        if (!dir) lista = [];
-        else {
-          carpeta = dir.name;
-          const r = await fetch(`https://api.github.com/repos/${VIN_REPO}/contents/${encodeURIComponent(carpeta)}`);
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          lista = (await r.json()).filter(f => f.type === 'file' && /\.(jpe?g|png|webp)$/i.test(f.name))
-                      .map(f => f.name).sort((a, b) => a.localeCompare(b, 'es'));
-          try { sessionStorage.setItem('sebrox-vin-lista-2', JSON.stringify({ t: Date.now(), l: lista, c: carpeta })); } catch (e) {}
-        }
-      } catch (e) { lista = []; vinError = true; }
+      let res = null;
+      try { res = await desdeGithub(); } catch (e) {}
+      if (!res) { try { res = await desdeJsdelivr(); } catch (e) {} }
+      if (res) {
+        lista = res.l.sort((x, y) => x.localeCompare(y, 'es')); carpeta = res.c;
+        try { localStorage.setItem(LKEY, JSON.stringify({ t: Date.now(), l: lista, c: carpeta })); } catch (e) {}
+      } else if (guardada) { lista = guardada.l; carpeta = guardada.c; }
+      else { lista = []; vinError = true; }
     }
     vinImagenes = lista.map(n => ({ nombre: nombreLindo(n), url: encodeURIComponent(carpeta) + '/' + encodeURIComponent(n) }));
     pintarGaleria();
